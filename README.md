@@ -136,7 +136,7 @@ Download it from:
 
 ## 👨‍💻 Author
 
-**Nihar**
+**Nihar Kanakam**
 B.Tech Computer Science | [Lovely Professional University]
 Project Duration: Mar 2026 – May 2026
 Course: Computer Vision
