@@ -1,109 +1,140 @@
-# 🌾 AgroVaidya — AI-Powered Personal Farming Assistant
+# 🌾 AgroVaidya — AI-Powered Crop Disease Detection & Farming Assistant
 
-> A computer vision system that detects crop diseases and pest infestations from leaf images using MobileNetV3-Large, with LLM-powered treatment recommendations for smallholder farmers.
+An AI-powered farming assistant that detects crop diseases from leaf images using **MobileNetV3-Large** and provides instant farmer-friendly treatment recommendations through a web interface.
+
+Built as a Computer Vision project to help farmers quickly identify plant diseases and receive actionable guidance using image-based diagnosis.
 
 ---
 
 ## 📌 Project Overview
 
-Smallholder farmers lose over **35% of their crop yield** annually due to undetected diseases and pests. AgroVaidya puts an AI-powered agronomist in every farmer's pocket — just take a photo of your crop leaf and get an instant diagnosis with a treatment plan.
+Crop diseases and pest infections can significantly reduce crop yield when not identified early. AgroVaidya helps solve this problem by allowing farmers to upload a leaf image and instantly receive:
 
-The system combines a fine-tuned **MobileNetV3-Large CNN** for visual disease classification with an **LLM reasoning layer** that converts predictions into actionable, farmer-friendly advice.
+- Disease prediction
+- Confidence score
+- Treatment suggestions
+- Prevention guidance
+
+The system combines **Computer Vision + Deep Learning + Web API integration** to deliver a simple and practical farming support tool.
 
 ---
 
 ## ✨ Features
 
-- 🔍 **Crop disease detection** across 38 disease classes with **98% accuracy**
-- 🌿 **Confusion matrix & training curves** to validate and visualize model performance
-- 🤖 **LLM-powered recommendations** — treatment plans, pesticide advice, and prevention tips in plain language
-- 📱 **Custom HTML/CSS frontend** connected to a Flask REST API backend
-- 🧪 **Transfer learning** — fine-tuned MobileNetV3-Large on the PlantVillage dataset
+- 🔍 Detects crop diseases from leaf images
+- 🌿 Supports **38 disease classes**
+- 📊 Achieves **~98% validation accuracy** on PlantVillage dataset
+- 🤖 Generates treatment and prevention recommendations
+- 🌐 Custom web interface for image upload and results
+- ⚡ Flask backend for model prediction API
+- 📈 Model evaluation using confusion matrix and training curves
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Category | Technologies |
-|---|---|
-| Language | Python, HTML, CSS |
-| Deep Learning | PyTorch, torchvision |
-| Computer Vision | OpenCV, Albumentations |
-| Model | MobileNetV3-Large (Transfer Learning) |
-| Evaluation | scikit-learn, Matplotlib, Seaborn |
-| LLM Integration | Anthropic API |
-| Backend | Flask REST API |
-| Frontend | HTML / CSS / JavaScript |
+### Languages
+- Python
+- HTML
+- CSS
+- JavaScript
+
+### Deep Learning & Computer Vision
+- PyTorch
+- TorchVision
+- OpenCV
+- Albumentations
+
+### Model
+- MobileNetV3-Large (Transfer Learning)
+
+### Backend
+- Flask REST API
+
+### Evaluation
+- Scikit-learn
+- Matplotlib
+- Seaborn
 
 ---
 
 ## 📁 Project Structure
 
-```
+```bash
 agrovaidya/
 │
-├── agrovaidya.html         ← Frontend web interface
-├── train.py                ← MobileNetV3 training script
-├── requirements.txt        ← All dependencies
+├── api/
+│   ├── api.py
+│   └── start_agrovaidya.bat
 │
 ├── model/
-│   ├── plant_disease_model.pth   ← Saved model weights
-│   └── class_names.json          ← 38 class labels
+│   ├── plant_disease_model.pth
+│   └── class_names.json
 │
-├── Figure_1.png            ← Training accuracy & loss curves
-└── Figure_2.png            ← Confusion matrix (38 classes)
+├── agrovaidya.html
+├── train.py
+├── requirements.txt
+├── README.md
 ```
 
 ---
 
 ## 🚀 How to Run
 
-### 1. Clone the repository
+### 1. Clone repository
+
 ```bash
-git clone https://github.com/Nihar335/agrovaidya.git
-cd agrovaidya
+git clone https://github.com/Nihar335/ai-farming-assistant.git
+cd ai-farming-assistant
 ```
 
 ### 2. Install dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Train the model (or skip if .pth file is available)
+### 3. Run Flask API
+
 ```bash
-python train.py
+python api/api.py
 ```
 
-### 4. Add your API key
-Create a `.env` file in the root folder:
-```
-ANTHROPIC_API_KEY=your_api_key_here
-```
+### 4. Open frontend
 
-### 5. Run the Flask API
+Open:
+
 ```bash
-python app.py
+agrovaidya.html
 ```
 
-### 6. Open the frontend
-Open `agrovaidya.html` in your browser.
+in browser.
+
+### 5. Upload crop leaf image
+
+- Select image
+- Click predict
+- View:
+  - disease name
+  - confidence score
+  - treatment recommendation
 
 ---
 
-## 🧠 How It Works
+## 🧠 Workflow
 
-```
-Farmer captures leaf image
+```text
+Leaf image upload
         ↓
-Image preprocessing (resize 224×224, normalize)
+Image preprocessing
         ↓
-MobileNetV3-Large CNN classifies disease (38 classes)
+MobileNetV3-Large prediction
         ↓
-Confidence score + predicted class returned
+Disease classification
         ↓
-LLM generates treatment recommendation
+Treatment recommendation
         ↓
-Farmer receives diagnosis + advice on screen
+Result shown on web interface
 ```
 
 ---
@@ -111,56 +142,45 @@ Farmer receives diagnosis + advice on screen
 ## 📊 Model Performance
 
 | Metric | Value |
-|---|---|
-| Dataset | PlantVillage (54,000+ images) |
-| Number of Classes | 38 disease classes |
-| Classification Accuracy | **98%** |
-| Base Model | MobileNetV3-Large (ImageNet pre-trained) |
-| Training Strategy | Transfer Learning (fine-tuned classifier head) |
-| Epochs | 15 |
-| Optimizer | Adam (lr=0.001, StepLR scheduler) |
-| Final Val Loss | ~0.06 |
-
----
-
-## 📈 Training Results
-
-**Accuracy per Epoch** — Model reaches 98% validation accuracy by epoch 15
-
-**Loss per Epoch** — Validation loss drops from 0.16 → 0.06 over 15 epochs showing strong convergence with no overfitting
+|---|---:|
+| Dataset | PlantVillage |
+| Classes | 38 |
+| Model | MobileNetV3-Large |
+| Accuracy | ~98% |
+| Framework | PyTorch |
+| Training Type | Transfer Learning |
 
 ---
 
 ## 📦 Dataset
 
-This project uses the **PlantVillage Dataset** — 54,000+ labelled leaf images across 38 disease classes covering tomato, potato, corn, apple, grape, and more.
+Dataset used:
 
-Download it from:
-- [Kaggle — PlantVillage Dataset](https://www.kaggle.com/datasets/emmarex/plantdisease)
-- [TensorFlow Datasets](https://www.tensorflow.org/datasets/catalog/plant_village)
+**PlantVillage Dataset**
 
-> ⚠️ Dataset is not included in this repository due to size. Download and place it in the path defined in `train.py`.
+Includes labeled crop leaf images across multiple crops and disease categories.
+
+Dataset is not uploaded in this repository due to file size.
 
 ---
 
-## 🎯 Real-World Impact
+## 🎯 Project Outcome
 
-- 🇮🇳 India has **140 million farming households**
-- Only **1 agronomist per 1,000 farmers** is available
-- AgroVaidya provides instant expert-level diagnosis via any smartphone camera
-- Supports **local language output** through LLM integration
+- Built a practical crop disease detection system
+- Improved disease identification accuracy using transfer learning
+- Created a farmer-friendly web interface
+- Delivered fast predictions with treatment guidance
 
 ---
 
 ## 👨‍💻 Author
 
-**Nihar Kanakam**
-B.Tech Computer Science | Lovely Professional University
-Project Duration: Mar 2026 – May 2026
-Course: Computer Vision
+**Nihar Kanakam**  
+B.Tech Computer Science  
+Lovely Professional University
 
 ---
 
 ## 📄 License
 
-This project is for academic purposes only.
+Academic project for learning and demonstration purposes.
