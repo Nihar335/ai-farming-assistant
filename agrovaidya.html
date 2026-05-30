@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AgroVaidya — AI Powered Personal Farming Assistant</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap');
+    :root {
+      --green:#2D6A0F;--green-light:#EAF3DE;--green-mid:#4A9020;
+      --teal:#0F6E56;--teal-light:#E1F5EE;
+      --amber:#B06A00;--amber-light:#FFF3DC;
+      --coral:#993C1D;--coral-light:#FAECE7;
+      --blue:#185FA5;--blue-light:#E6F1FB;
+      --gray:#F5F4F0;--border:#DDD9CC;
+      --text:#1A1A1A;--text2:#555;--shadow:0 2px 16px rgba(0,0,0,0.08);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Inter',sans-serif;background:#F0EDE5;color:var(--text);min-height:100vh;}
+    .header{background:linear-gradient(135deg,var(--green) 0%,#1A4A08 100%);color:white;padding:1.5rem 2rem;display:flex;align-items:center;gap:1rem;box-shadow:0 2px 20px rgba(0,0,0,0.2);}
+    .header-icon{font-size:2.2rem;}
+    .header h1{font-family:'Playfair Display',serif;font-size:1.6rem;}
+    .header p{font-size:0.8rem;opacity:0.8;margin-top:2px;}
+    .header-badge{margin-left:auto;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:4px 14px;font-size:0.75rem;white-space:nowrap;}
+    .container{max-width:900px;margin:0 auto;padding:1.5rem 1rem 3rem;}
+    .lang-bar{display:flex;gap:8px;margin-bottom:1.2rem;}
+    .lang-btn{padding:6px 16px;border-radius:20px;border:1px solid var(--border);background:white;font-size:0.8rem;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s;}
+    .lang-btn.active{background:var(--teal);color:white;border-color:var(--teal);}
+    .tabs{display:flex;gap:6px;margin-bottom:1.5rem;flex-wrap:wrap;}
+    .tab{padding:9px 20px;border-radius:8px;border:1px solid var(--border);background:white;font-size:0.85rem;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s;color:var(--text2);}
+    .tab.active{background:var(--green);color:white;border-color:var(--green);}
+    .panel{display:none;}.panel.active{display:block;}
+    .card{background:white;border:1px solid var(--border);border-radius:14px;padding:1.5rem;margin-bottom:1rem;box-shadow:var(--shadow);}
+    .card-title{font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:0.4rem;}
+    .card-sub{font-size:0.82rem;color:var(--text2);margin-bottom:1.2rem;line-height:1.5;}
+    .field{margin-bottom:1rem;}
+    .field label{display:block;font-size:0.75rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;}
+    select,input[type="text"],textarea{width:100%;padding:10px 13px;border:1px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:0.88rem;background:white;color:var(--text);outline:none;transition:border 0.15s;}
+    select:focus,input:focus,textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(45,106,15,0.1);}
+    textarea{min-height:90px;resize:vertical;line-height:1.6;}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    @media(max-width:560px){.grid2{grid-template-columns:1fr;}}
+    .btn{width:100%;padding:12px;border-radius:8px;border:none;font-family:'Inter',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all 0.15s;margin-top:4px;}
+    .btn-green{background:var(--green);color:white;}
+    .btn-green:hover{background:#1E4A08;}
+    .btn-green:disabled{opacity:0.55;cursor:not-allowed;}
+    .chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
+    .chip{padding:5px 13px;border:1px solid var(--border);border-radius:20px;font-size:0.78rem;cursor:pointer;background:white;color:var(--text2);font-family:'Inter',sans-serif;transition:all 0.12s;}
+    .chip.sel{background:var(--coral-light);color:var(--coral);border-color:#F5C4B3;}
+    .upload-zone{border:2px dashed var(--border);border-radius:10px;padding:1.5rem;text-align:center;cursor:pointer;color:var(--text2);font-size:0.85rem;transition:all 0.15s;margin-bottom:1rem;}
+    .upload-zone:hover,.upload-zone.has-image{border-color:var(--green);background:var(--green-light);}
+    #img-preview{width:100%;max-height:200px;object-fit:contain;border-radius:8px;margin-bottom:8px;display:none;}
+    #file-input{display:none;}
+    .result{border-radius:12px;padding:1.2rem 1.4rem;margin-top:1rem;display:none;}
+    .result.teal{background:var(--teal-light);border:1px solid #9FE1CB;}
+    .result.amber{background:var(--amber-light);border:1px solid #FAC775;}
+    .result.coral{background:var(--coral-light);border:1px solid #F5C4B3;}
+    .result.blue{background:var(--blue-light);border:1px solid #85B7EB;}
+    .result-label{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;}
+    .result.teal .result-label{color:var(--teal);}
+    .result.amber .result-label{color:var(--amber);}
+    .result.coral .result-label{color:var(--coral);}
+    .result.blue .result-label{color:var(--blue);}
+    .result-text{font-size:0.88rem;line-height:1.8;white-space:pre-wrap;color:var(--text);}
+    .conf-bar-wrap{background:#EEE;border-radius:20px;height:8px;overflow:hidden;margin-bottom:12px;}
+    .conf-bar{height:100%;background:linear-gradient(90deg,var(--green-mid),var(--green));border-radius:20px;transition:width 0.6s ease;}
+    .top3{display:flex;gap:8px;flex-wrap:wrap;}
+    .top3-item{background:var(--gray);border-radius:6px;padding:6px 10px;font-size:0.75rem;color:var(--text2);}
+    .top3-item strong{color:var(--text);display:block;}
+    .healthy-badge{display:inline-block;background:var(--green-light);color:var(--green);border:1px solid #C0DD97;border-radius:6px;padding:4px 12px;font-size:0.78rem;font-weight:600;margin-bottom:8px;}
+    .disease-badge{display:inline-block;background:var(--coral-light);color:var(--coral);border:1px solid #F5C4B3;border-radius:6px;padding:4px 12px;font-size:0.78rem;font-weight:600;margin-bottom:8px;}
+    .dots{display:inline-flex;gap:5px;align-items:center;}
+    .dots span{width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 0.8s infinite;}
+    .dots span:nth-child(2){animation-delay:0.15s;}
+    .dots span:nth-child(3){animation-delay:0.3s;}
+    @keyframes blink{0%,80%,100%{transform:scale(0.6);opacity:0.3}40%{transform:scale(1);opacity:1}}
+    .api-status{display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text2);margin-bottom:1rem;}
+    .status-dot{width:8px;height:8px;border-radius:50%;background:#CCC;flex-shrink:0;}
+    .status-dot.online{background:#3AB54A;box-shadow:0 0 6px rgba(58,181,74,0.5);}
+    .status-dot.offline{background:#E53935;}
+    .lang-indicator{background:var(--teal-light);border:1px solid #9FE1CB;border-radius:8px;padding:8px 14px;font-size:0.82rem;color:var(--teal);margin-bottom:1rem;display:none;}
+    .footer{text-align:center;font-size:0.75rem;color:var(--text2);margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border);line-height:1.8;}
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">🌿</div>
+  <div>
+    <h1>AgroVaidya</h1>
+    <p>AI Powered Personal Farming Assistant · R223NNB37 · Nihar Kanakam</p>
+  </div>
+  <div class="header-badge">CNN Accuracy: 98.10%</div>
+</div>
+
+<div class="container">
+
+  <div class="lang-bar">
+    <button class="lang-btn active" onclick="setLang('english',this)">🇬🇧 English</button>
+    <button class="lang-btn" onclick="setLang('hindi',this)">🇮🇳 हिंदी</button>
+    <button class="lang-btn" onclick="setLang('punjabi',this)">🇮🇳 ਪੰਜਾਬੀ</button>
+  </div>
+
+  <div class="lang-indicator" id="lang-indicator"></div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('disease',this)">🔬 Disease Detection</button>
+    <button class="tab" onclick="switchTab('advisor',this)">🌱 Crop Advisor</button>
+    <button class="tab" onclick="switchTab('calendar',this)">📅 Farm Calendar</button>
+    <button class="tab" onclick="switchTab('market',this)">💰 Market & Schemes</button>
+  </div>
+
+  <!-- TAB 1 -->
+  <div id="panel-disease" class="panel active">
+    <div class="card">
+      <div class="card-title">🔬 Crop Disease Detector</div>
+      <div class="card-sub">Upload a photo of your affected crop leaf. Our trained CNN model (MobileNetV3, 98.10% accuracy) identifies the disease, then AI gives full treatment advice.</div>
+      <div class="api-status">
+        <div class="status-dot" id="api-dot"></div>
+        <span id="api-status-text">Checking model API...</span>
+      </div>
+      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+        <img id="img-preview" />
+        <div id="upload-txt">
+          <div style="font-size:2rem;margin-bottom:6px">📷</div>
+          <div><strong>Click to upload plant photo</strong></div>
+          <div style="font-size:0.75rem;margin-top:4px;opacity:0.7">JPG, PNG supported</div>
+        </div>
+      </div>
+      <input type="file" id="file-input" accept="image/*" onchange="handleImage(event)" />
+      <div class="field">
+        <label>Quick symptoms</label>
+        <div class="chips">
+          <button class="chip" onclick="addSymptom(this,'yellow leaves')">Yellow leaves</button>
+          <button class="chip" onclick="addSymptom(this,'brown spots')">Brown spots</button>
+          <button class="chip" onclick="addSymptom(this,'wilting')">Wilting</button>
+          <button class="chip" onclick="addSymptom(this,'white powder on leaves')">White powder</button>
+          <button class="chip" onclick="addSymptom(this,'holes in leaves')">Holes in leaves</button>
+          <button class="chip" onclick="addSymptom(this,'rotting roots')">Rotting roots</button>
+          <button class="chip" onclick="addSymptom(this,'stunted growth')">Stunted growth</button>
+          <button class="chip" onclick="addSymptom(this,'rust colored patches')">Rust patches</button>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Crop type</label>
+          <select id="dis-crop">
+            <option value="">Select...</option>
+            <option>Tomato</option><option>Potato</option><option>Corn (Maize)</option>
+            <option>Apple</option><option>Grape</option><option>Pepper</option>
+            <option>Wheat</option><option>Rice</option><option>Other</option>
+          </select>
+        </div>
+        <div class="field"><label>Growth stage</label>
+          <select id="dis-stage">
+            <option value="">Select...</option>
+            <option>Seedling</option><option>Vegetative</option>
+            <option>Flowering</option><option>Fruiting</option><option>Pre-harvest</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Additional symptoms</label>
+        <textarea id="symptom-text" placeholder="Describe what you see on the plant..."></textarea>
+      </div>
+      <button class="btn btn-green" id="disease-btn" onclick="analyzeDisease()">Analyze with AI Model</button>
+    </div>
+    <div id="model-result-box" class="card" style="display:none;">
+      <div class="card-title" style="font-size:1rem;margin-bottom:1rem">🤖 CNN Model Prediction</div>
+      <div id="model-result-inner"></div>
+    </div>
+    <div id="disease-result" class="result coral">
+      <div class="result-label">AI Treatment Advice</div>
+      <div class="result-text" id="disease-out"></div>
+    </div>
+  </div>
+
+  <!-- TAB 2 -->
+  <div id="panel-advisor" class="panel">
+    <div class="card">
+      <div class="card-title">🌱 Smart Crop Advisor</div>
+      <div class="card-sub">Get personalized crop recommendations based on your land, soil, season and budget.</div>
+      <div class="grid2">
+        <div class="field"><label>State</label>
+          <select id="adv-state">
+            <option value="">Select...</option>
+            <option>Punjab</option><option>Haryana</option><option>Uttar Pradesh</option>
+            <option>Maharashtra</option><option>Rajasthan</option><option>Gujarat</option>
+            <option>Madhya Pradesh</option><option>Bihar</option><option>Karnataka</option>
+            <option>Andhra Pradesh</option><option>Telangana</option><option>Other</option>
+          </select>
+        </div>
+        <div class="field"><label>Season</label>
+          <select id="adv-season">
+            <option value="">Select...</option>
+            <option>Kharif (June–Oct)</option>
+            <option>Rabi (Oct–March)</option>
+            <option>Zaid (March–June)</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Soil type</label>
+          <select id="adv-soil">
+            <option value="">Select...</option>
+            <option>Alluvial (Domat)</option><option>Black cotton soil</option>
+            <option>Red laterite</option><option>Sandy</option>
+            <option>Loamy</option><option>Clay</option><option>Not sure</option>
+          </select>
+        </div>
+        <div class="field"><label>Land size (acres)</label>
+          <input type="text" id="adv-land" placeholder="e.g. 2.5" />
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Water source</label>
+          <select id="adv-water">
+            <option value="">Select...</option>
+            <option>Canal (Nahar)</option><option>Tubewell / Borewell</option>
+            <option>Rain-fed only</option><option>Drip irrigation</option>
+          </select>
+        </div>
+        <div class="field"><label>Previous crop</label>
+          <input type="text" id="adv-prev" placeholder="e.g. Wheat" />
+        </div>
+      </div>
+      <div class="field"><label>Budget (₹)</label>
+        <input type="text" id="adv-budget" placeholder="e.g. 15000" />
+      </div>
+      <button class="btn btn-green" onclick="getCropAdvice()">Get Recommendations</button>
+    </div>
+    <div id="advisor-result" class="result teal">
+      <div class="result-label">Crop Recommendations</div>
+      <div class="result-text" id="advisor-out"></div>
+    </div>
+  </div>
+
+  <!-- TAB 3 -->
+  <div id="panel-calendar" class="panel">
+    <div class="card">
+      <div class="card-title">📅 Personalized Farming Calendar</div>
+      <div class="card-sub">Get a month-by-month farming schedule tailored to your crop and region.</div>
+      <div class="grid2">
+        <div class="field"><label>Crop</label>
+          <select id="cal-crop">
+            <option value="">Select...</option>
+            <option>Wheat (Gehun)</option><option>Rice (Paddy)</option>
+            <option>Maize</option><option>Cotton</option><option>Sugarcane</option>
+            <option>Tomato</option><option>Potato</option><option>Mustard</option><option>Chickpea</option>
+          </select>
+        </div>
+        <div class="field"><label>State</label>
+          <select id="cal-state">
+            <option value="">Select...</option>
+            <option>Punjab</option><option>Haryana</option><option>Uttar Pradesh</option>
+            <option>Maharashtra</option><option>Gujarat</option><option>Rajasthan</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-green" onclick="getFarmCalendar()">Generate My Calendar</button>
+    </div>
+    <div id="calendar-result" class="result blue">
+      <div class="result-label">Your Farming Calendar</div>
+      <div class="result-text" id="calendar-out"></div>
+    </div>
+  </div>
+
+  <!-- TAB 4 -->
+  <div id="panel-market" class="panel">
+    <div class="card">
+      <div class="card-title">💰 Market Prices & Government Schemes</div>
+      <div class="card-sub">Ask about MSP rates, PM-KISAN, PMFBY, subsidies, and best time to sell your crop.</div>
+      <div class="field"><label>Your question</label>
+        <textarea id="market-query" placeholder="e.g. What is the MSP for wheat this year? What subsidies are available for drip irrigation in Punjab?"></textarea>
+      </div>
+      <div class="field"><label>Your state</label>
+        <select id="market-state">
+          <option value="">Select...</option>
+          <option>Punjab</option><option>Haryana</option><option>UP</option>
+          <option>Maharashtra</option><option>MP</option><option>Other</option>
+        </select>
+      </div>
+      <button class="btn btn-green" onclick="getMarketInfo()">Get Information</button>
+    </div>
+    <div id="market-result" class="result amber">
+      <div class="result-label">Market & Scheme Info</div>
+      <div class="result-text" id="market-out"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    AgroVaidya · AI Powered Personal Farming Assistant<br>
+    R223NNB37 · Nihar Kanakam · MobileNetV3 · PlantVillage (54,306 images) · Accuracy: 98.10%
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// ════════════════════════════════════════════
+
+const FLASK_API  = "http://localhost:5000";
+
+
+let selectedLang = 'english';
+let capturedFile = null;
+
+// ── Language ─────────────────────────────────
+function setLang(lang, btn) {
+  selectedLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const indicator = document.getElementById('lang-indicator');
+  const msgs = {
+    english: '🇬🇧 Language set to English — all AI responses will be in English',
+    hindi:   '🇮🇳 भाषा हिंदी में सेट की गई — सभी AI उत्तर हिंदी में होंगे',
+    punjabi: '🇮🇳 ਭਾਸ਼ਾ ਪੰਜਾਬੀ ਵਿੱਚ ਸੈੱਟ ਕੀਤੀ ਗਈ — ਸਾਰੇ AI ਜਵਾਬ ਪੰਜਾਬੀ ਵਿੱਚ ਹੋਣਗੇ'
+  };
+  indicator.textContent = msgs[lang];
+  indicator.style.display = 'block';
+}
+
+function getLangInstruction() {
+  if (selectedLang === 'hindi')
+    return 'IMPORTANT: You MUST write your ENTIRE response in Hindi using Devanagari script only. Do not use any English words except technical terms like NPK, MSP.';
+  if (selectedLang === 'punjabi')
+    return 'IMPORTANT: You MUST write your ENTIRE response in Punjabi using Gurmukhi script only. Do not use any English words except technical terms.';
+  return 'Respond in clear simple English.';
+}
+
+// ── Tabs ─────────────────────────────────────
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+}
+
+// ── Chips ────────────────────────────────────
+function addSymptom(btn, text) {
+  btn.classList.toggle('sel');
+  const ta = document.getElementById('symptom-text');
+  if (btn.classList.contains('sel')) {
+    ta.value = (ta.value ? ta.value + ', ' : '') + text;
+  } else {
+    ta.value = ta.value.replace(', ' + text, '').replace(text, '').replace(/^,\s*/, '').trim();
+  }
+}
+
+// ── Image ────────────────────────────────────
+function handleImage(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  capturedFile = file;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const p = document.getElementById('img-preview');
+    p.src = ev.target.result;
+    p.style.display = 'block';
+    document.getElementById('upload-txt').style.display = 'none';
+    document.getElementById('upload-zone').classList.add('has-image');
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── API status ───────────────────────────────
+async function checkAPIStatus() {
+  try {
+    const res  = await fetch(FLASK_API + "/health");
+    const data = await res.json();
+    if (data.status === "healthy") {
+      document.getElementById('api-dot').classList.add('online');
+      document.getElementById('api-status-text').textContent =
+        `Model API online · ${data.device.toUpperCase()} · 38 disease classes loaded`;
+    }
+  } catch {
+    document.getElementById('api-dot').classList.add('offline');
+    document.getElementById('api-status-text').textContent =
+      'Model API offline — please run api.py first';
+  }
+}
+checkAPIStatus();
+
+// ── Loading ──────────────────────────────────
+function setLoading(outId, resultId) {
+  document.getElementById(resultId).style.display = 'block';
+  document.getElementById(outId).innerHTML =
+    '<div class="dots"><span></span><span></span><span></span></div> Getting AI response...';
+}
+
+// ── Groq call ────────────────────────────────
+async function callGroq(systemMsg, userMsg) {
+  const res = await fetch(FLASK_API + "/chat", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      systemMsg,
+      userMsg
+    })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Groq error");
+  }
+
+  return data.reply;
+}
+
+function sysPrompt() {
+  return `You are AgroVaidya, an expert AI farming assistant for Indian farmers. Give practical, specific, actionable advice. Always mention costs in Indian Rupees. ${getLangInstruction()}`;
+}
+
+// ── Supported crops in dataset ───────────────
+const SUPPORTED_CROPS = ['tomato','potato','corn','maize','apple','grape','pepper','wheat','rice'];
+
+function isCropSupported(cropName) {
+  if (!cropName) return true; // no crop selected, don't block
+  return SUPPORTED_CROPS.some(c => cropName.toLowerCase().includes(c));
+}
+
+// ── Disease Detection ────────────────────────
+async function analyzeDisease() {
+  if (!capturedFile) { alert('Please upload a plant photo first.'); return; }
+  const btn = document.getElementById('disease-btn');
+  btn.disabled = true; btn.textContent = 'Analyzing...';
+
+  const modelBox   = document.getElementById('model-result-box');
+  const modelInner = document.getElementById('model-result-inner');
+  modelBox.style.display = 'block';
+  modelInner.innerHTML = '<div class="dots"><span></span><span></span><span></span></div> Running CNN model...';
+
+  const selectedCrop = document.getElementById('dis-crop').value;
+  const stage        = document.getElementById('dis-stage').value;
+  const sym          = document.getElementById('symptom-text').value;
+
+  // FIX 3 — Unknown crop warning before even calling model
+  if (selectedCrop && !isCropSupported(selectedCrop)) {
+    modelInner.innerHTML = `
+      <div style="background:#FFF3DC;border:1px solid #FAC775;border-radius:8px;padding:12px 14px;margin-bottom:10px">
+        <strong style="color:#B06A00">⚠️ Crop Not In Dataset</strong><br>
+        <span style="font-size:0.82rem;color:#555">Your selected crop <strong>${selectedCrop}</strong> is not in our training dataset (we support: Tomato, Potato, Corn, Apple, Grape, Pepper). The CNN result below may be inaccurate. AI advice will still be generated based on your symptoms.</span>
+      </div>`;
+  }
+
+  let pred = null;
+  let lowConfidence = false;
+  let cropMismatch = false;
+
+  try {
+    const fd = new FormData();
+    fd.append('image', capturedFile);
+    const r = await fetch(FLASK_API + "/predict", { method: "POST", body: fd });
+    const d = await r.json();
+
+    if (d.success) {
+      pred = d;
+
+      // FIX 1 — Confidence threshold check
+      lowConfidence = d.confidence < 70;
+
+      // FIX 3 — Crop mismatch check
+      cropMismatch = selectedCrop &&
+        !d.crop.toLowerCase().includes(selectedCrop.toLowerCase()) &&
+        !selectedCrop.toLowerCase().includes(d.crop.toLowerCase());
+
+      let warningHTML = '';
+      if (lowConfidence) {
+        warningHTML += `
+          <div style="background:#FAECE7;border:1px solid #F5C4B3;border-radius:8px;padding:10px 14px;margin-bottom:10px">
+            <strong style="color:#993C1D">⚠️ Low Confidence (${d.confidence}%)</strong><br>
+            <span style="font-size:0.82rem;color:#555">The model is not confident about this result. This may be because: the photo is blurry, the crop is not in our dataset, or the leaf is not clearly visible. Please try a clearer, closer photo. AI advice below is based on your described symptoms instead.</span>
+          </div>`;
+      }
+      if (cropMismatch && !lowConfidence) {
+        warningHTML += `
+          <div style="background:#FFF3DC;border:1px solid #FAC775;border-radius:8px;padding:10px 14px;margin-bottom:10px">
+            <strong style="color:#B06A00">⚠️ Crop Mismatch</strong><br>
+            <span style="font-size:0.82rem;color:#555">You selected <strong>${selectedCrop}</strong> but the model detected <strong>${d.crop}</strong>. The CNN result may be unreliable for your crop. AI advice will prioritize your selected crop and symptoms.</span>
+          </div>`;
+      }
+
+      const badge = d.is_healthy
+        ? `<span class="healthy-badge">✅ Healthy Plant</span>`
+        : `<span class="disease-badge">⚠️ Disease Detected</span>`;
+
+      const existingWarn = modelInner.innerHTML.includes('Crop Not In Dataset')
+        ? modelInner.innerHTML : '';
+
+      modelInner.innerHTML = existingWarn + warningHTML + `
+        ${badge}
+        <h3 style="font-size:1rem;font-weight:600;color:var(--green);margin-bottom:4px">${d.crop} — ${d.disease}</h3>
+        <div style="font-size:0.8rem;color:var(--text2);margin-bottom:8px">Confidence: <strong>${d.confidence}%</strong> (${d.confidence_label})</div>
+        <div class="conf-bar-wrap"><div class="conf-bar" style="width:${d.confidence}%;background:${lowConfidence ? '#E67E22' : ''}"></div></div>
+        <div style="font-size:0.75rem;color:var(--text2);margin-bottom:8px">Top 3 predictions:</div>
+        <div class="top3">${d.top3.map((t,i)=>`<div class="top3-item"><strong>#${i+1} ${t.crop} — ${t.disease}</strong>${t.confidence}% confidence</div>`).join('')}</div>`;
+    } else {
+      modelInner.innerHTML = `<span style="color:var(--coral)">Model error: ${d.error}</span>`;
+    }
+  } catch {
+    modelInner.innerHTML = `<span style="color:var(--coral)">⚠️ Cannot reach model API. Make sure api.py is running.</span>`;
+  }
+
+  // FIX 2 — Smart Groq prompt: use symptoms as fallback if low confidence or crop mismatch
+  setLoading('disease-out', 'disease-result');
+  try {
+    let prompt = 'A farmer needs crop disease help.';
+
+    if (pred && !lowConfidence && !cropMismatch) {
+      // High confidence + matching crop → trust CNN result fully
+      prompt += `\nCNN Model detected with HIGH confidence: ${pred.crop} — ${pred.disease} (${pred.confidence}%). ${pred.is_healthy ? 'Plant appears healthy.' : ''}`;
+    } else if (pred && lowConfidence) {
+      // Low confidence → tell Groq to ignore CNN and rely on symptoms
+      prompt += `\nNote: CNN model gave a LOW CONFIDENCE result (${pred.confidence}%) so it may be unreliable. Please base your advice primarily on the farmer's described symptoms below, not the CNN result.`;
+    } else if (pred && cropMismatch) {
+      // Crop mismatch → warn Groq
+      prompt += `\nNote: CNN detected ${pred.crop} but farmer says their crop is ${selectedCrop}. Please prioritize the farmer's stated crop in your advice.`;
+    }
+
+    if (selectedCrop) prompt += `\nFarmer's crop: ${selectedCrop}`;
+    if (stage)        prompt += `\nGrowth stage: ${stage}`;
+    if (sym)          prompt += `\nFarmer describes symptoms: ${sym}`;
+    if (!selectedCrop && !sym) prompt += `\nNo crop or symptoms provided — give general plant disease advice.`;
+
+    prompt += `\n\nProvide:\n1. DIAGNOSIS — disease name\n2. CAUSE — fungus/bacteria/pest/deficiency\n3. SEVERITY — Low/Medium/High\n4. TREATMENT — organic and chemical with dosage\n5. URGENT ACTION — next 24 hours\n6. PREVENTION — future crops`;
+
+    const result = await callGroq(sysPrompt(), prompt);
+    document.getElementById('disease-out').textContent = result;
+  } catch(e) { document.getElementById('disease-out').textContent = 'Error: ' + e.message; }
+
+  btn.disabled = false; btn.textContent = 'Analyze with AI Model';
+}
+
+// ── Crop Advisor ─────────────────────────────
+async function getCropAdvice() {
+  const state = document.getElementById('adv-state').value;
+  const season = document.getElementById('adv-season').value;
+  if (!state || !season) { alert('Please select state and season.'); return; }
+  setLoading('advisor-out', 'advisor-result');
+  try {
+    const prompt = `Farmer details:\nState: ${state}, Season: ${season}\nSoil: ${document.getElementById('adv-soil').value||'not specified'}\nLand: ${document.getElementById('adv-land').value||'not specified'} acres\nWater: ${document.getElementById('adv-water').value||'not specified'}\nPrevious crop: ${document.getElementById('adv-prev').value||'not specified'}\nBudget: ₹${document.getElementById('adv-budget').value||'not specified'}\n\nProvide:\n1. TOP 3 RECOMMENDED CROPS with reasons\n2. EXPECTED YIELD & INCOME per acre in ₹\n3. INPUT COSTS in ₹ per acre\n4. NET PROFIT per acre\n5. CROP ROTATION TIP\n6. GOVERNMENT SCHEMES available\n7. MAIN RISKS`;
+    document.getElementById('advisor-out').textContent = await callGroq(sysPrompt(), prompt);
+  } catch(e) { document.getElementById('advisor-out').textContent = 'Error: ' + e.message; }
+}
+
+// ── Farm Calendar ────────────────────────────
+async function getFarmCalendar() {
+  const crop = document.getElementById('cal-crop').value;
+  const state = document.getElementById('cal-state').value;
+  if (!crop || !state) { alert('Please select crop and state.'); return; }
+  setLoading('calendar-out', 'calendar-result');
+  try {
+    const prompt = `Create a complete month-by-month farming calendar for:\nCrop: ${crop}, State: ${state}\n\nInclude: land preparation, sowing dates, seed rate, irrigation schedule, fertilizer doses (NPK in kg/acre), pest monitoring, spray schedule, weeding, harvesting, post-harvest storage.\nMake it practical and easy for a farmer to follow.`;
+    document.getElementById('calendar-out').textContent = await callGroq(sysPrompt(), prompt);
+  } catch(e) { document.getElementById('calendar-out').textContent = 'Error: ' + e.message; }
+}
+
+// ── Market Info ──────────────────────────────
+async function getMarketInfo() {
+  const query = document.getElementById('market-query').value;
+  const state = document.getElementById('market-state').value;
+  if (!query) { alert('Please type your question.'); return; }
+  setLoading('market-out', 'market-result');
+  try {
+    const prompt = `Farmer from ${state||'India'} asks: "${query}"\n\nAnswer with: direct answer, MSP rates if relevant, applicable schemes (PM-KISAN, PMFBY etc.), how to apply, helpline numbers, tips to maximize income.`;
+    document.getElementById('market-out').textContent = await callGroq(sysPrompt(), prompt);
+  } catch(e) { document.getElementById('market-out').textContent = 'Error: ' + e.message; }
+}
+</script>
+</body>
+</html>
