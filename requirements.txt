@@ -1,0 +1,11 @@
+torch
+torchvision
+flask
+flask-cors
+pillow
+requests
+numpy
+matplotlib
+seaborn
+scikit-learn
+tqdm
