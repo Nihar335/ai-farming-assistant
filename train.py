@@ -15,10 +15,14 @@ import time
 # ─────────────────────────────────────────────
 #  CONFIGURATION  — edit only this section
 # ─────────────────────────────────────────────
-DATASET_PATH  = r"C:\Computer Vision Project\Dataset\plantvillage dataset\color"
-MODEL_SAVE    = r"C:\Computer Vision Project\model\plant_disease_model.pth"
-CLASSES_SAVE  = r"C:\Computer Vision Project\model\class_names.json"
-PLOTS_FOLDER  = r"C:\Computer Vision Project\model"
+# Paths are relative to the repository root. Put the PlantVillage "color"
+# folder at dataset/plantvillage dataset/color, or set the DATASET_PATH env var.
+BASE_DIR      = os.path.dirname(os.path.abspath(__file__))
+DATASET_PATH  = os.getenv("DATASET_PATH",
+                          os.path.join(BASE_DIR, "dataset", "plantvillage dataset", "color"))
+MODEL_SAVE    = os.path.join(BASE_DIR, "model", "plant_disease_model.pth")
+CLASSES_SAVE  = os.path.join(BASE_DIR, "model", "class_names.json")
+PLOTS_FOLDER  = os.path.join(BASE_DIR, "model")
 
 BATCH_SIZE    = 32
 NUM_EPOCHS    = 15
