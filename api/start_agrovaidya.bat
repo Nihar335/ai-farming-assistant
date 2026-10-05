@@ -8,8 +8,8 @@ echo    AgroVaidya - Disease Detection API
 echo ==================================================
 echo.
 
-:: Change to the project directory
-cd /d "C:\Computer Vision Project\api"
+:: Change to the folder this script lives in (the api folder)
+cd /d "%~dp0"
 
 :: Check if Python is available
 python --version >nul 2>&1
@@ -21,10 +21,10 @@ if errorlevel 1 (
 )
 
 :: Check if the model file exists
-if not exist "C:\Computer Vision Project\model\plant_disease_model.pth" (
+if not exist "%~dp0..\model\plant_disease_model.pth" (
     color 0C
     echo [ERROR] Model file not found at:
-    echo         C:\Computer Vision Project\model\plant_disease_model.pth
+    echo         %~dp0..\model\plant_disease_model.pth
     echo.
     echo Make sure your model file is in the correct location.
     pause
@@ -32,10 +32,10 @@ if not exist "C:\Computer Vision Project\model\plant_disease_model.pth" (
 )
 
 :: Check if the class names file exists
-if not exist "C:\Computer Vision Project\model\class_names.json" (
+if not exist "%~dp0..\model\class_names.json" (
     color 0C
     echo [ERROR] class_names.json not found at:
-    echo         C:\Computer Vision Project\model\class_names.json
+    echo         %~dp0..\model\class_names.json
     pause
     exit /b 1
 )
