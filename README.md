@@ -42,8 +42,6 @@ The system combines **Computer Vision + Deep Learning + Web API integration** to
 ### Deep Learning & Computer Vision
 - PyTorch
 - TorchVision
-- OpenCV
-- Albumentations
 
 ### Model
 - MobileNetV3-Large (Transfer Learning)
@@ -100,6 +98,18 @@ pip install -r requirements.txt
 python api/api.py
 ```
 
+Treatment recommendations use the Groq API, so set your key before starting the server:
+
+```bash
+# Windows
+set GROQ_API_KEY=your_key_here
+
+# macOS / Linux
+export GROQ_API_KEY=your_key_here
+```
+
+On Windows you can also double-click `api/start_agrovaidya.bat`.
+
 ### 4. Open frontend
 
 Open:
@@ -118,6 +128,14 @@ in browser.
   - disease name
   - confidence score
   - treatment recommendation
+
+### Retrain the model (optional)
+
+A trained model is already included in `model/`. To retrain, download the PlantVillage dataset and place the `color` folder at `dataset/plantvillage dataset/color` (or set the `DATASET_PATH` environment variable), then run:
+
+```bash
+python train.py
+```
 
 ---
 
